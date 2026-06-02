@@ -1,0 +1,220 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart City Portal V3</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb);color:#fff}
+.hidden{display:none}
+header{text-align:center;padding:15px}
+.card{background:rgba(255,255,255,.12);padding:18px;border-radius:12px;margin:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+input,select,textarea{width:100%;padding:10px;margin:6px 0;border:none;border-radius:8px}
+button{background:#facc15;border:none;padding:10px 14px;border-radius:8px;font-weight:bold;cursor:pointer}
+.ticker{background:#facc15;color:#000;padding:8px;overflow:hidden;white-space:nowrap}
+.ticker span{display:inline-block;animation:move 20s linear infinite}
+@keyframes move{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+.stat{font-size:28px;color:#facc15;font-weight:bold}
+.heat{padding:10px;border-radius:8px;margin:5px 0}
+.high{background:#dc2626}.medium{background:#ea580c}.low{background:#16a34a}
+#chatbot{position:fixed;right:15px;bottom:15px;width:280px;background:#fff;color:#000;border-radius:10px;overflow:hidden}
+#chatHead{background:#2563eb;color:#fff;padding:10px}
+#msgs{height:180px;overflow:auto;padding:10px}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid rgba(255,255,255,.2);padding:8px}
+</style>
+</head>
+<body>
+
+<div id="loginPage">
+<header><h1>SMART CITY PORTAL V3</h1><p>Role Based Login</p></header>
+<div class="card" style="max-width:500px;margin:auto">
+<select id="role">
+<option>Citizen</option>
+<option>Municipal Officer</option>
+</select>
+<input placeholder="Username">
+<input type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+</div>
+</div>
+
+<div id="citizenDashboard" class="hidden">
+<header><h1>Citizen Dashboard</h1><button onclick="logout()">Logout</button></header>
+<div class="ticker"><span>🚦 Traffic Updates | 🚌 Bus Tracking | 🌦 Smart Monitoring | 📢 Complaint Services Active</span></div>
+
+<div class="grid">
+<div class="card"><div class="stat">1250+</div>Complaints Resolved</div>
+<div class="card"><div class="stat">450</div>Active Buses</div>
+<div class="card"><div class="stat">98%</div>Citizen Satisfaction</div>
+</div>
+
+<div class="card">
+<h3>Smart Search</h3>
+<input id="searchBox" placeholder="Search traffic, bus, complaint">
+<button onclick="smartSearch()">Search</button>
+<p id="searchResult"></p>
+</div>
+
+<div class="grid">
+<div class="card">
+<h3>Bus Tracking</h3>
+<input id="busNo" placeholder="Enter Bus Number">
+<button onclick="trackBus()">Track Bus</button>
+<p id="busResult"></p>
+</div>
+
+<div class="card">
+<h3>Traffic Updates</h3>
+<ul>
+<li>Heavy Traffic near Whitefield</li>
+<li>Road Work at KR Puram</li>
+<li>Signal Delay at Marathahalli</li>
+</ul>
+</div>
+</div>
+
+<div class="grid">
+<div class="card">
+<h3>Register Complaint</h3>
+<input placeholder="Complaint Title">
+<textarea placeholder="Describe issue"></textarea>
+<input type="file" id="imgUpload">
+<img id="preview" style="max-width:150px;display:none">
+<button>Submit Complaint</button>
+</div>
+
+<div class="card">
+<h3>Complaint Status</h3>
+<progress value="75" max="100" style="width:100%"></progress>
+<p>75% Complete - Under Review</p>
+</div>
+</div>
+
+<div class="card">
+<h3>Smart Monitoring Center (Weather + Collision Detection)</h3>
+<div class="heat high">Whitefield 35°C | Collision Risk HIGH</div>
+<div class="heat medium">KR Puram 31°C | Collision Risk MEDIUM</div>
+<div class="heat low">Hebbal 27°C | Collision Risk LOW</div>
+</div>
+
+<div class="card">
+<h3>Citizen Feedback</h3>
+<input placeholder="Your Name">
+<select><option>5 Stars</option><option>4 Stars</option><option>3 Stars</option></select>
+<textarea placeholder="Share your feedback"></textarea>
+<button onclick="feedback()">Submit Feedback</button>
+<p id="fbmsg"></p>
+</div>
+
+<div id="chatbot">
+<div id="chatHead">🤖 Smart City AI</div>
+<div id="msgs"><div>AI: Hello! Ask about buses, traffic, or complaints.</div></div>
+<input id="chatInput" placeholder="Ask something">
+<button style="width:100%" onclick="chat()">Send</button>
+</div>
+</div>
+
+<div id="officerDashboard" class="hidden">
+<header><h1>Municipal Officer Dashboard</h1><button onclick="logout()">Logout</button></header>
+
+<div class="card">
+<h3>Complaint Analytics</h3>
+<canvas id="complaintChart"></canvas>
+</div>
+
+<div class="card">
+<h3>Complaint Statistics</h3>
+<p>Completed: 900</p>
+<p>In Progress: 375</p>
+<p>Not Started: 225</p>
+</div>
+
+<div class="card">
+<h3>Registered Complaints</h3>
+<table>
+<tr><th>ID</th><th>Type</th><th>Status</th></tr>
+<tr><td>BLR001</td><td>Pothole</td><td>Completed</td></tr>
+<tr><td>BLR002</td><td>Garbage</td><td>In Progress</td></tr>
+<tr><td>BLR003</td><td>Street Light</td><td>Not Started</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>Citizen Feedback</h3>
+<p>★★★★★ Complaint resolved quickly.</p>
+<p>★★★★ Bus tracking is useful.</p>
+<p>★★★★★ Easy to use portal.</p>
+</div>
+</div>
+
+<script>
+function login(){
+ let role=document.getElementById('role').value;
+ document.getElementById('loginPage').style.display='none';
+ if(role==='Citizen'){
+   document.getElementById('citizenDashboard').classList.remove('hidden');
+ }else{
+   document.getElementById('officerDashboard').classList.remove('hidden');
+   setTimeout(loadChart,100);
+ }
+}
+function logout(){location.reload();}
+
+function smartSearch(){
+ let q=document.getElementById('searchBox').value.toLowerCase();
+ let arr=['traffic updates','bus tracking','pothole complaint','garbage complaint'];
+ document.getElementById('searchResult').innerText=arr.filter(x=>x.includes(q)).join(', ')||'No results';
+}
+
+function trackBus(){
+ let b=document.getElementById('busNo').value;
+ document.getElementById('busResult').innerText='Bus '+b+' is near Whitefield. ETA 10 mins.';
+}
+
+function feedback(){
+ document.getElementById('fbmsg').innerText='Thank you for your feedback!';
+}
+
+function chat(){
+ let msg=document.getElementById('chatInput').value.toLowerCase();
+ let reply='Please contact city support.';
+ if(msg.includes('bus')) reply='Use the Bus Tracking section.';
+ if(msg.includes('complaint')) reply='Use Register Complaint section.';
+ if(msg.includes('traffic')) reply='See Traffic Updates panel.';
+ document.getElementById('msgs').innerHTML += '<div>You: '+msg+'</div><div>AI: '+reply+'</div>';
+ document.getElementById('chatInput').value='';
+}
+
+function loadChart(){
+ const ctx=document.getElementById('complaintChart');
+ if(!ctx) return;
+ new Chart(ctx,{
+ type:'bar',
+ data:{
+ labels:['Completed','In Progress','Not Started'],
+ datasets:[{label:'Complaints',data:[900,375,225],backgroundColor:['#22c55e','#eab308','#ef4444'],borderColor:['#22c55e','#eab308','#ef4444'],borderWidth:1}]
+ }
+ });
+}
+
+document.addEventListener('change',function(e){
+ if(e.target.id==='imgUpload'){
+   const file=e.target.files[0];
+   if(!file) return;
+   const r=new FileReader();
+   r.onload=function(ev){
+      let img=document.getElementById('preview');
+      img.src=ev.target.result;
+      img.style.display='block';
+   };
+   r.readAsDataURL(file);
+ }
+});
+</script>
+</body>
+</html>
